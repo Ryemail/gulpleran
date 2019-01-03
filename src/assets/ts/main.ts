@@ -1,8 +1,11 @@
 import { sayHello } from "./greet";
+import { array,Tuple,enums } from "./array";
 
+
+array();
+Tuple();
+enums();
 function showHello(divName: string, name: string) {
-    const elt = document.getElementById(divName);
-    elt.innerText = sayHello(name);
 }
 
 showHello("greeting", "TypeScript第一节");

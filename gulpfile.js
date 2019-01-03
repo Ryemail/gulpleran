@@ -1,13 +1,5 @@
 var gulp = require("gulp");
 
-// var ts = require("gulp-typescript"); 
-// var tsProject = ts.createProject("tsconfig.json");
-// gulp.task("default", function () {
-//     return tsProject.src()
-//         .pipe(tsProject())
-//         .js.pipe(gulp.dest(paths.js));
-// });
-
 var browserify = require("browserify");
 var source = require('vinyl-source-stream');
 var tsify = require("tsify");
@@ -17,22 +9,21 @@ var gutil = require("gulp-util"); // 压缩代码
 var uglify = require('gulp-uglify');//混淆代码
 var sourcemaps = require('gulp-sourcemaps');
 var buffer = require('vinyl-buffer');
-var connect = require('gulp-connect');//实时刷新
+var webserver = require('gulp-webserver');//实时刷新
 var less = require('gulp-less');
 
 /* 输入目录 */
 var entryDir = {
-    pages: ['src/*.html'],
     js: ['src/assets/ts/main.ts'],
     css: ['src/assets/less/index.less', 'src/assets/less/detail.less'],
-    html: ['src/views/**/*'],
+    html: ['src/views/**/*','src/*.html'],
     img: ["src/assets/image/**/*"]
 }
 /* 输出目录 */
 var outDir = {
     js: 'dist/assets/js',
     css: 'dist/assets/css',
-    html: 'dist/view',
+    html: ['dist/view','dist'],
     img: 'dist/assets/image'
 }
 
@@ -46,8 +37,10 @@ gulp.task('css', function () {
 
 /* copy=>html img 任务 */
 gulp.task('copyHtml', function () {
-    gulp.src(entryDir.html)
-        .pipe(gulp.dest(outDir.html));
+    gulp.src(entryDir.html[0])
+        .pipe(gulp.dest(outDir.html[0]));
+    gulp.src(entryDir.html[1])
+        .pipe(gulp.dest(outDir.html[1]));
 });
 gulp.task('copyImg', function () {
     gulp.src(entryDir.img)
@@ -92,13 +85,16 @@ gulp.task('watch',function(){
 
 
 /* server 任务 */
-gulp.task('webserver', function () {
-    connect.server({
+gulp.task('webserver', function() {
+    gulp.src('./')
+      .pipe(webserver({
         livereload: true,
-        port: 0105,
-        open: true
-    });
-});
+        directoryListing: true,
+        open: true,
+        fallback: '/dist/index.html',
+        directoryListing: false
+      }));
+  });
 
 gulp.task('default', ['ts', 'css', 'copyImg', 'copyHtml', 'watch','webserver']);
 
